@@ -1,6 +1,7 @@
 @props([
     'groupTitle',
     'results',
+    'search'
 ])
 @php
     $hasSearchItemTree = $this->getConfigs()->hasSearchItemTree();
@@ -38,6 +39,7 @@
                 :isLast="$loop->last"
                 :hasSearchItemTree="$hasSearchItemTree"
                 :hasExpandedUrlTarget="$hasExpandedUrlTarget"
+                :search="$search"
             />
         @endforeach
     </ul>

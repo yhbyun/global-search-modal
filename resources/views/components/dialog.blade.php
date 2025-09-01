@@ -11,21 +11,21 @@
     $EmptyQueryView=$this->getConfigs()->getEmptyQueryView();
 @endphp
 <div>
-    <div 
-        x-ignore 
+    <div
+        x-ignore
         ax-load
-        x-load-css="[@js(FilamentAsset::getStyleHref('global-search-modal', 'charrafimed/global-search-modal'))]" 
+        x-load-css="[@js(FilamentAsset::getStyleHref('global-search-modal', 'charrafimed/global-search-modal'))]"
         ax-load-src="{{ FilamentAsset::getAlpineComponentSrc('global-search-modal-observer', 'charrafimed/global-search-modal') }}"
         x-data="observer"
     >
     <x-global-search-modal::modal>
         <x-slot:header>
-            <form 
+            <form
                 class="relative flex w-full items-center px-1 py-0.5"
                 >
-                    <label 
+                    <label
                         class="flex h-4 w-4 items-center justify-center text-gray-300/40 dark:text-white/30"
-                        id="search-label" 
+                        id="search-label"
                         for="search-input"
                         >
                           <x-global-search-modal::icon.search wire:loading.class="hidden"/>
@@ -33,7 +33,7 @@
                                 <x-global-search-modal::icon.loading-indicator/>
                           </div>
                     </label>
-                    <x-global-search-modal::search.input 
+                    <x-global-search-modal::search.input
                         :placeholder="$placeholder"
                         :maxlength="$maxLength"
                     />
@@ -52,34 +52,37 @@
         @endif
         </x-slot:header>
         <x-slot:dropdown>
-        <div     
+        <div
             x-ignore
             ax-load
             ax-load-src="{{ FilamentAsset::getAlpineComponentSrc('global-search-modal-search', 'charrafimed/global-search-modal') }}"
+            @add-to-recent-searches.window="addToRecentSearches($event.detail.search)"
             x-data="searchComponent({
-                recentSearchesKey:  @js($this->getPanelId() . "_recent_search"),
-                favoriteSearchesKey: @js( $this->getPanelId() . "_favorites_search"),
+                recentSearchesKey:  @js($this->getPanelId() . "_recent_searches"),
+                favoriteItemsKey: @js( $this->getPanelId() . "_favorite_items"),
+                recentViewsKey: @js( $this->getPanelId() . "_recent_views"),
                 maxItemsAllowed:  @js( $maxItemsAllowed),
                 retainRecentIfFavorite : @js($isRetainRecentIfFavorite)
             })"
             >
             @unless(empty($search))
-                <x-global-search-modal::search.results 
+                <x-global-search-modal::search.results
                     :results="$results"
+                    :search="$search"
                 />
             @else
                 <div
                     class="w-full global-search-modal"
                     >
                     @unless (filled($EmptyQueryView))
-                        <div>                            
-                            <template x-if="search_history.length <=0 && favorite_items.length <=0">
+                        <div>
+                            <template x-if="recent_searches.length <=0 && favorite_items.length <=0 && recent_items.length <=0">
                                 <x-global-search-modal::search.empty-query-text/>
                             </template>
                         </div>
                     @else
                         <div>
-                            <template x-if="search_history.length <=0 && favorite_items.length <=0">
+                            <template x-if="recent_searches.length <=0 && favorite_items.length <=0 && recent_items.length <=0">
                                 <div>     {{-- this div is nessacery to get this working  --}}
                                     {!! $EmptyQueryView->render() !!}
                                 </div>
@@ -88,21 +91,21 @@
                     @endunless
                     <x-global-search-modal::search.summary.summary-wrapper />
                 </div>
-            @endunless  
+            @endunless
         </div>
         </x-slot:dropdown>
 
         @if ($hasFooterView)
             <x-slot:footer>
                 @unless (filled($footerView))
-                        <x-global-search-modal::search.footer/>    
+                        <x-global-search-modal::search.footer/>
                 @else
                     {!! $footerView->render() !!}
                 @endif
             </x-slot:footer>
           @endif
-        
 
-    </x-global-search-modal::modal>    
+
+    </x-global-search-modal::modal>
 </div>
 </div>

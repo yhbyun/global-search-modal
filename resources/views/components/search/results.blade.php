@@ -1,5 +1,6 @@
 @props([
     'results',
+    'search'
 ])
 
 @php
@@ -30,6 +31,7 @@
                 <x-global-search-modal::search.grouped-results
                     :groupTitle="$groupTitle"
                     :results="$groupedResults"
+                    :search="$search"
                 />
             @endforeach
         </ul>

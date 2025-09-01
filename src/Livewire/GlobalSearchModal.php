@@ -63,7 +63,20 @@ class GlobalSearchModal extends Component
         }
         return $results;
     }
-    
+
+    public function saveRecentSearch(string $search)
+    {
+        $search = trim($search);
+        if (!empty($search)) {
+            $this->dispatch('add-to-recent-searches', search: $search);
+        }
+    }
+
+    public function setSearch(string $term)
+    {
+        $this->search = $term;
+    }
+
     protected function hasTenantOrIsAuthenticated(): bool
     {
         return Filament::getTenant() || auth()->check();

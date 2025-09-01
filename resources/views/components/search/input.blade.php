@@ -19,7 +19,7 @@
     enterkeyhint="go"
     spellcheck="false"
     placeholder="{{__( $placeholder) }}"
-    x-on:keydown.enter.prevent 
+    x-on:keydown.enter.prevent="$wire.saveRecentSearch($el.value)"
     autofocus="true"
     maxlength="{{ $maxlength }}"
     @class([
