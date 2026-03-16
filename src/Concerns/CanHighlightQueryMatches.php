@@ -32,12 +32,15 @@ trait CanHighlightQueryMatches
         }
         return $styles;
     }
-    // public  function highlightQueryClasses(?string $classes): self
-    // {
-    //     $this->highlightQueryClasses = $classes;
-    //     return $this;
-    // }
-    public  function highlighter(bool $enabled = true): self
+
+    public function highlightQueryClasses(?string $classes): self
+    {
+        $this->highlightQueryClasses = $classes;
+
+        return $this;
+    }
+
+    public function highlighter(bool $enabled = true): self
     {
         $this->highlightQueryMatches = $enabled;
         return $this;
