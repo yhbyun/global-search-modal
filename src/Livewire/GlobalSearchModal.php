@@ -2,14 +2,14 @@
 
 namespace CharrafiMed\GlobalSearchModal\Livewire;
 
-use Livewire\Component;
-use Filament\Facades\Filament;
-use Livewire\Attributes\Computed;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\View\View;
-use Filament\GlobalSearch\GlobalSearchResult;
-use Filament\GlobalSearch\GlobalSearchResults;
+use App\Filament\Resources\CompanyResource;
+use App\Utils\SearchHelper;
 use CharrafiMed\GlobalSearchModal\Utils\Highlighter;
+use Filament\Facades\Filament;
+use Filament\GlobalSearch\GlobalSearchResults;
+use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
+use Livewire\Component;
 
 #[AllowDynamicProperties]
 class GlobalSearchModal extends Component
@@ -28,10 +28,9 @@ class GlobalSearchModal extends Component
         return filament()->getCurrentPanel()->getId();
     }
 
-
     public function getResults(): ?GlobalSearchResults
     {
-        if (!$this->hasTenantOrIsAuthenticated()) {
+        if (! $this->hasTenantOrIsAuthenticated()) {
             return null;
         }
 
@@ -43,7 +42,7 @@ class GlobalSearchModal extends Component
 
         $results = Filament::getGlobalSearchProvider()->getResults($search);
 
-        if (!$results || !$this->getConfigs()->isMustHighlightQueryMatches()) {
+        if (! $results || ! $this->getConfigs()->isMustHighlightQueryMatches()) {
             return $results;
         }
 
@@ -51,23 +50,33 @@ class GlobalSearchModal extends Component
         $styles = $this->getConfigs()->getHighlightQueryStyles() ?? '';
 
         // Apply highlighting to search results
-        foreach ($results->getCategories() as &$categoryResults) {
+        $companyCategory = CompanyResource::getPluralModelLabel();
+        // Remove corporate suffixes but keep spaces for word-level highlighting
+        $companyPattern = str_replace(' ', "\x00", $search);
+        $companyPattern = SearchHelper::normalizeCompanySearchTerm($companyPattern);
+        $companyPattern = str_replace("\x00", ' ', $companyPattern);
+
+        foreach ($results->getCategories() as $category => &$categoryResults) {
+            $pattern = $category === $companyCategory ? $companyPattern : $search;
+
             foreach ($categoryResults as &$result) {
                 $result->highlightedTitle = Highlighter::make(
                     text: $result->title,
-                    pattern: $search,
+                    pattern: $pattern,
                     styles: $styles,
-                    classes: $classes
+                    classes: $classes,
+                    splitWords: true
                 );
             }
         }
+
         return $results;
     }
 
     public function saveRecentSearch(string $search)
     {
         $search = trim($search);
-        if (!empty($search)) {
+        if (! empty($search)) {
             $this->dispatch('add-to-recent-searches', search: $search);
         }
     }

@@ -1,24 +1,34 @@
 <?php
+
 namespace CharrafiMed\GlobalSearchModal\Utils;
 
 class Highlighter
 {
-    public static function make(?string $text, ?string $pattern, ?string $styles = '', ?string $classes = '')
+    public static function make(?string $text, ?string $pattern, ?string $styles = '', ?string $classes = '', bool $splitWords = false)
     {
-        if (blank($pattern)) return $text;
+        if (blank($pattern)) {
+            return $text;
+        }
 
         $highlightedPattern = '<span';
 
-        if(!empty($classes)) {
-            $highlightedPattern .= ' class="' . $classes . '"';
+        if (! empty($classes)) {
+            $highlightedPattern .= ' class="'.$classes.'"';
         }
 
-        if (!empty($styles)) {
-            $highlightedPattern .= ' style="' . $styles . '"';
+        if (! empty($styles)) {
+            $highlightedPattern .= ' style="'.$styles.'"';
         }
 
         $highlightedPattern .= '>$0</span>';
 
-        return preg_replace('/(' . preg_quote($pattern, '/') . ')/i', $highlightedPattern, $text);
+        if ($splitWords) {
+            $words = array_unique(array_filter(explode(' ', $pattern)));
+            $regex = implode('|', array_map(fn ($w) => preg_quote($w, '/'), $words));
+        } else {
+            $regex = preg_quote($pattern, '/');
+        }
+
+        return preg_replace('/('.$regex.')/iu', $highlightedPattern, $text);
     }
 }
